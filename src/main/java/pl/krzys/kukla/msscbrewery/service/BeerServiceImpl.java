@@ -20,4 +20,13 @@ public class BeerServiceImpl implements BeerService {
         return beerDto;
     }
 
+    @Override
+    public BeerDto saveBeer(BeerDto beerDto) {
+        return BeerDto.builder()
+            .beerName(beerDto.getBeerName())
+            .beerStyle(beerDto.getBeerStyle())
+            .build();
+
+    }
+
 }

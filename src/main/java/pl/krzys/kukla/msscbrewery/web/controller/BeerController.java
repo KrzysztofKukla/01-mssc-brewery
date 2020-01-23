@@ -26,7 +26,6 @@ public class BeerController {
     //we can use here BeerDto as well and @RestController will serialize that to json
     //but @ResponseEntity gives you more control and more flexibility to manage object
     public ResponseEntity<BeerDto> getBeer(@PathVariable("beerId") UUID beerId) {
-        BeerDto beerDto = BeerDto.builder().build();
 
         return new ResponseEntity<>(beerService.getBeerById(beerId), HttpStatus.OK);
     }

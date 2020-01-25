@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.krzys.kukla.msscbrewery.service.BeerService;
@@ -32,7 +33,7 @@ public class BeerController {
         return new ResponseEntity<>(beerService.getBeerById(beerId), HttpStatus.OK);
     }
 
-    @PostMapping
+    @PostMapping //POST - creating new Beer
     public ResponseEntity<BeerDto> handlePost(BeerDto beerDto) {
         BeerDto savedBeer = beerService.saveBeer(beerDto);
 
@@ -43,6 +44,16 @@ public class BeerController {
         httpHeaders.add("Location", "/api/v1/beer" + savedBeer.getUuid().toString());
 
         return new ResponseEntity(httpHeaders, HttpStatus.CREATED);
+    }
+
+    // PUT update existing Beer
+    // is idempotent - we can call that multiple times - will be affect only first time
+    @PutMapping(value = "/{beerId}")
+    //beerId should be passed here as above to be read only to not allow client update that property for BeerDto object
+    public ResponseEntity handleUpdate(@PathVariable UUID beerId, BeerDto beerDto) {
+        beerService.updateBeer(beerId, beerDto);
+
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
 }

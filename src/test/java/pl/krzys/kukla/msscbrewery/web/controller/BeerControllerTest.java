@@ -96,4 +96,13 @@ class BeerControllerTest {
         BDDMockito.then(beerService).should().updateBeer(any(UUID.class), any(BeerDto.class));
     }
 
+    @Test
+    void deleteBeer() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/beer/{beerId}", UUID.randomUUID())
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isNoContent());
+
+        BDDMockito.then(beerService).should().deleteById(any(UUID.class));
+    }
+
 }

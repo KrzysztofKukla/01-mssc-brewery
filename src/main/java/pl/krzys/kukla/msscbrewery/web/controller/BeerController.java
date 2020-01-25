@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.krzys.kukla.msscbrewery.service.BeerService;
@@ -34,7 +35,8 @@ public class BeerController {
     }
 
     @PostMapping //POST - creating new Beer
-    public ResponseEntity<BeerDto> handlePost(BeerDto beerDto) {
+    //@RequestBody binds property from request to BeerDto object
+    public ResponseEntity<BeerDto> handlePost(@RequestBody BeerDto beerDto) {
         BeerDto savedBeer = beerService.saveBeer(beerDto);
 
         //here ResponseEntity should have location header on it
@@ -50,7 +52,7 @@ public class BeerController {
     // is idempotent - we can call that multiple times - will be affect only first time
     @PutMapping(value = "/{beerId}")
     //beerId should be passed here as above to be read only to not allow client update that property for BeerDto object
-    public ResponseEntity handleUpdate(@PathVariable UUID beerId, BeerDto beerDto) {
+    public ResponseEntity handleUpdate(@PathVariable UUID beerId, @RequestBody BeerDto beerDto) {
         beerService.updateBeer(beerId, beerDto);
 
         return new ResponseEntity(HttpStatus.NO_CONTENT);

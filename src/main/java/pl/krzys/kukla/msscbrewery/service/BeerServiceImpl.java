@@ -25,6 +25,7 @@ public class BeerServiceImpl implements BeerService {
     @Override
     public BeerDto saveBeer(BeerDto beerDto) {
         return BeerDto.builder()
+            .uuid(UUID.randomUUID())
             .beerName(beerDto.getBeerName())
             .beerStyle(beerDto.getBeerStyle())
             .build();

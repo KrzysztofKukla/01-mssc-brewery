@@ -5,6 +5,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Null;
+import javax.validation.constraints.Positive;
 import java.util.UUID;
 
 /**
@@ -19,9 +22,16 @@ import java.util.UUID;
 //DTO ( Data Transfer Object ) is needed for working with web layer
 public class BeerDto {
 
+    @Null // not allow client to setup  id
     private UUID uuid;
+
+    @NotBlank
     private String beerName;
+
+    @NotBlank
     private String beerStyle;
+
+    @Positive
     private Long upc;
 
 }

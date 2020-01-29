@@ -4,12 +4,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import pl.krzys.kukla.msscbrewery.service.v2.BeerServiceV2;
 import pl.krzys.kukla.msscbrewery.web.model.v2.BeerDtoV2;
 
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -17,6 +19,7 @@ import java.util.UUID;
 /**
  * @author Krzysztof Kukla
  */
+@Validated // don't used too much
 @RequestMapping("/api/v2/beer")
 @RestController
 @RequiredArgsConstructor
@@ -27,14 +30,14 @@ public class BeerControllerV2 {
     @GetMapping("/{beerId}")
     //we can use here BeerDto as well and @RestController will serialize that to json
     //but @ResponseEntity gives you more control and more flexibility to manage object
-    public ResponseEntity<BeerDtoV2> getBeer(@PathVariable("beerId") UUID beerId) {
+    public ResponseEntity<BeerDtoV2> getBeer(@NotNull @PathVariable("beerId") UUID beerId) {
 
         return new ResponseEntity<>(beerServiceV2.getBeerById(beerId), HttpStatus.OK);
     }
 
     @PostMapping //POST - creating new Beer
     //@RequestBody binds property from request to BeerDto object
-    public ResponseEntity<BeerDtoV2> handlePost(@Valid @RequestBody BeerDtoV2 beerDto) {
+    public ResponseEntity<BeerDtoV2> handlePost(@Valid @NotNull @RequestBody BeerDtoV2 beerDto) {
         BeerDtoV2 savedBeer = beerServiceV2.saveBeer(beerDto);
 
         //here ResponseEntity should have location header on it

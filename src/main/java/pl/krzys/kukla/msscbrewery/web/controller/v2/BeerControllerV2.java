@@ -1,6 +1,8 @@
 package pl.krzys.kukla.msscbrewery.web.controller.v2;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +30,7 @@ import java.util.UUID;
 @RequestMapping("/api/v2/beer")
 @RestController
 @RequiredArgsConstructor
-
+@Slf4j
 public class BeerControllerV2 {
     private final BeerServiceV2 beerServiceV2;
 
@@ -43,11 +45,14 @@ public class BeerControllerV2 {
     @PostMapping //POST - creating new Beer
     //@RequestBody binds property from request to BeerDto object
     public ResponseEntity<BeerDtoV2> handlePost(@Valid @NotNull @RequestBody BeerDtoV2 beerDto) {
-        BeerDtoV2 savedBeer = beerServiceV2.saveBeer(beerDto);
+        //lombok val - type will be inferred from the initializing expression and generates object as final
+        val savedBeer = beerServiceV2.saveBeer(beerDto);
+
+        log.debug("in handle Post...");
 
         //here ResponseEntity should have location header on it
         //so after creation we want to return back to the client URL where it was created at
-        HttpHeaders httpHeaders = new HttpHeaders();
+        var httpHeaders = new HttpHeaders(); //'var' will not generate object as final - val does it
         //TODO add hostname to url
         httpHeaders.add("Location", "/api/v1/beer" + savedBeer.getUuid().toString());
 

@@ -8,7 +8,7 @@ import pl.krzys.kukla.msscbrewery.web.model.BeerDto;
  * @author Krzysztof Kukla
  */
 //it will generate BeerMapperImpl class with implemented methods
-@Mapper
+@Mapper(uses = DateMapper.class)
 public interface BeerMapper {
     Beer beerDtoToBeer(BeerDto beerDto);
 

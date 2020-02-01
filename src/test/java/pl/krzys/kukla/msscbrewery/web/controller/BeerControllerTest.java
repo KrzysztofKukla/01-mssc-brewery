@@ -16,6 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
+import org.springframework.restdocs.payload.PayloadDocumentation;
 import org.springframework.restdocs.request.RequestDocumentation;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -82,6 +83,15 @@ class BeerControllerTest {
                 ),
                 RequestDocumentation.requestParameters(
                     RequestDocumentation.parameterWithName("iscold").description("Is beer cold query param?")
+                ),
+                //here we need to document all fields for BeerDto, otherwise test will fail
+                PayloadDocumentation.responseFields(
+                    PayloadDocumentation.fieldWithPath("uuid").description("UUID of beer"),
+                    PayloadDocumentation.fieldWithPath("beerName").description("beerName of beer"),
+                    PayloadDocumentation.fieldWithPath("beerStyle").description("beerStyle of beer"),
+                    PayloadDocumentation.fieldWithPath("upc").description("upc of beer"),
+                    PayloadDocumentation.fieldWithPath("createdDate").description("createdDate of beer"),
+                    PayloadDocumentation.fieldWithPath("lastUpdatedDate").description("lastUpdatedDate of beer")
                 )
             ))
             .andReturn();

@@ -67,16 +67,23 @@ class BeerControllerTest {
         BDDMockito.when(beerService.getBeerById(any(UUID.class))).thenReturn(validBeerDto);
 
         MvcResult mvcResult = mockMvc.perform(RestDocumentationRequestBuilders.get("/api/v1/beer/{beerId}", validBeerDto.getUuid())
-            .accept(MediaType.APPLICATION_JSON))
+            .accept(MediaType.APPLICATION_JSON)
+            .param("iscold", "yes")
+        )
             .andExpect(status().isOk())
             .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath("$.upc", Matchers.is(validBeerDto.getUpc().intValue())))
             .andExpect(jsonPath("$.beerStyle", Matchers.equalTo(validBeerDto.getBeerStyle())))
 
             //andDo allows to generate documentation with pathParameters
-            .andDo(MockMvcRestDocumentation.document("/v1/beer", RequestDocumentation.pathParameters(
-                RequestDocumentation.parameterWithName("beerId").description("UUID of desired beer to get")
-            )))
+            .andDo(MockMvcRestDocumentation.document("/v1/beer",
+                RequestDocumentation.pathParameters(
+                    RequestDocumentation.parameterWithName("beerId").description("UUID of desired beer to get")
+                ),
+                RequestDocumentation.requestParameters(
+                    RequestDocumentation.parameterWithName("iscold").description("Is beer cold query param?")
+                )
+            ))
             .andReturn();
 
         String beerDtoJson = mvcResult.getResponse().getContentAsString();

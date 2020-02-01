@@ -14,6 +14,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
+import org.springframework.restdocs.request.RequestDocumentation;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -63,12 +66,17 @@ class BeerControllerTest {
     void getBeer() throws Exception {
         BDDMockito.when(beerService.getBeerById(any(UUID.class))).thenReturn(validBeerDto);
 
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/beer/{beerId}", validBeerDto.getUuid())
+        MvcResult mvcResult = mockMvc.perform(RestDocumentationRequestBuilders.get("/api/v1/beer/{beerId}", validBeerDto.getUuid())
             .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath("$.upc", Matchers.is(validBeerDto.getUpc().intValue())))
             .andExpect(jsonPath("$.beerStyle", Matchers.equalTo(validBeerDto.getBeerStyle())))
+
+            //andDo allows to generate documentation with pathParameters
+            .andDo(MockMvcRestDocumentation.document("/v1/beer", RequestDocumentation.pathParameters(
+                RequestDocumentation.parameterWithName("beerId").description("UUID of desired beer to get")
+            )))
             .andReturn();
 
         String beerDtoJson = mvcResult.getResponse().getContentAsString();

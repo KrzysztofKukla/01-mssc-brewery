@@ -81,7 +81,7 @@ class BeerControllerTest {
             .andExpect(jsonPath("$.beerStyle", Matchers.equalTo(validBeerDto.getBeerStyle())))
 
             //andDo allows to generate documentation with pathParameters
-            .andDo(MockMvcRestDocumentation.document("/v1/beer",
+            .andDo(MockMvcRestDocumentation.document("/v1/beer-get",
                 RequestDocumentation.pathParameters(
                     RequestDocumentation.parameterWithName("beerId").description("UUID of desired beer to get")
                 ),
@@ -151,7 +151,7 @@ class BeerControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(beerDtoJson))
             .andExpect(status().isCreated())
-            .andDo(MockMvcRestDocumentation.document("/v1/beer",
+            .andDo(MockMvcRestDocumentation.document("/v1/beer-new",
                 PayloadDocumentation.requestFields(
                     //duplication of code - side effect of using RestDocs
                     PayloadDocumentation.fieldWithPath("uuid").ignored(),

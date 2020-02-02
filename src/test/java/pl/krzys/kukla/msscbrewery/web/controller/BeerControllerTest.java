@@ -28,7 +28,9 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.util.StringUtils;
 import pl.krzys.kukla.msscbrewery.service.BeerService;
 import pl.krzys.kukla.msscbrewery.web.model.BeerDto;
+import pl.krzys.kukla.msscbrewery.web.model.v2.BeerStyleEnum;
 
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -90,13 +92,13 @@ class BeerControllerTest {
                 ),
                 //here we need to document all fields for BeerDto, otherwise test will fail
                 PayloadDocumentation.responseFields(
-                    PayloadDocumentation.fieldWithPath("uuid").description("UUID of beer"),
-                    PayloadDocumentation.fieldWithPath("beerName").description("beerName of beer"),
-                    PayloadDocumentation.fieldWithPath("beerStyle").description("beerStyle of beer"),
-                    PayloadDocumentation.fieldWithPath("upc").description("upc of beer"),
-                    PayloadDocumentation.fieldWithPath("createdDate").description("createdDate of beer"),
-                    PayloadDocumentation.fieldWithPath("lastUpdatedDate").description("lastUpdatedDate of beer"),
-                    PayloadDocumentation.fieldWithPath("quantityOnHand").description("quantityOnHand of beer")
+                    PayloadDocumentation.fieldWithPath("uuid").description("UUID of beer").type(UUID.class),
+                    PayloadDocumentation.fieldWithPath("beerName").description("beerName of beer").type(String.class),
+                    PayloadDocumentation.fieldWithPath("beerStyle").description("beerStyle of beer").type(BeerStyleEnum.class),
+                    PayloadDocumentation.fieldWithPath("upc").description("upc of beer").type(Long.class),
+                    PayloadDocumentation.fieldWithPath("createdDate").description("createdDate of beer").type(OffsetDateTime.class),
+                    PayloadDocumentation.fieldWithPath("lastUpdatedDate").description("lastUpdatedDate of beer").type(OffsetDateTime.class),
+                    PayloadDocumentation.fieldWithPath("quantityOnHand").description("quantityOnHand of beer").type(Integer.class)
                 )
             ))
             .andReturn();
@@ -155,12 +157,12 @@ class BeerControllerTest {
                 PayloadDocumentation.requestFields(
                     //duplication of code - side effect of using RestDocs
                     PayloadDocumentation.fieldWithPath("uuid").ignored(),
-                    PayloadDocumentation.fieldWithPath("beerName").description("beerName of beer"),
-                    PayloadDocumentation.fieldWithPath("beerStyle").description("beerStyle of beer"),
-                    PayloadDocumentation.fieldWithPath("upc").description("upc of beer"),
-                    PayloadDocumentation.fieldWithPath("createdDate").ignored(),
+                    PayloadDocumentation.fieldWithPath("beerName").description("beerName of beer").type(String.class),
+                    PayloadDocumentation.fieldWithPath("beerStyle").description("beerStyle of beer").type(BeerStyleEnum.class),
+                    PayloadDocumentation.fieldWithPath("upc").description("upc of beer").type(Long.class),
+                    PayloadDocumentation.fieldWithPath("createdDate").ignored().type(OffsetDateTime.class),
                     PayloadDocumentation.fieldWithPath("lastUpdatedDate").ignored(),
-                    PayloadDocumentation.fieldWithPath("quantityOnHand").description("quantityOnHand of beer")
+                    PayloadDocumentation.fieldWithPath("quantityOnHand").description("quantityOnHand of beer").type(Integer.class)
                 )
                 )
             );

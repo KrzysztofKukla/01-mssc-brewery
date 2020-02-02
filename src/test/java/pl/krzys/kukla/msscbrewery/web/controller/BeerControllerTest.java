@@ -14,14 +14,18 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.restdocs.constraints.ConstraintDescriptions;
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
+import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.restdocs.payload.PayloadDocumentation;
 import org.springframework.restdocs.request.RequestDocumentation;
+import org.springframework.restdocs.snippet.Attributes;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.util.StringUtils;
 import pl.krzys.kukla.msscbrewery.service.BeerService;
 import pl.krzys.kukla.msscbrewery.web.model.BeerDto;
 
@@ -91,7 +95,8 @@ class BeerControllerTest {
                     PayloadDocumentation.fieldWithPath("beerStyle").description("beerStyle of beer"),
                     PayloadDocumentation.fieldWithPath("upc").description("upc of beer"),
                     PayloadDocumentation.fieldWithPath("createdDate").description("createdDate of beer"),
-                    PayloadDocumentation.fieldWithPath("lastUpdatedDate").description("lastUpdatedDate of beer")
+                    PayloadDocumentation.fieldWithPath("lastUpdatedDate").description("lastUpdatedDate of beer"),
+                    PayloadDocumentation.fieldWithPath("quantityOnHand").description("quantityOnHand of beer")
                 )
             ))
             .andReturn();
@@ -109,10 +114,11 @@ class BeerControllerTest {
         String beerDtoJson = objectMapper.writeValueAsString(beerDto);
         BDDMockito.given(beerService.saveBeer(any(BeerDto.class))).willReturn(savedBeerDto);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/beer/")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(beerDtoJson))
-            .andExpect(status().isCreated());
+        //standard requestFields
+//        requestFields(beerDtoJson);
+
+        //to handle custom 'constraints' field
+        customRequestFieldsWithConstrainsts(beerDtoJson);
 
         BDDMockito.then(beerService).should().saveBeer(any(BeerDto.class));
     }
@@ -138,6 +144,71 @@ class BeerControllerTest {
             .andExpect(status().isNoContent());
 
         BDDMockito.then(beerService).should().deleteById(any(UUID.class));
+    }
+
+    private void requestFields(String beerDtoJson) throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/beer/")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(beerDtoJson))
+            .andExpect(status().isCreated())
+            .andDo(MockMvcRestDocumentation.document("/v1/beer",
+                PayloadDocumentation.requestFields(
+                    //duplication of code - side effect of using RestDocs
+                    PayloadDocumentation.fieldWithPath("uuid").ignored(),
+                    PayloadDocumentation.fieldWithPath("beerName").description("beerName of beer"),
+                    PayloadDocumentation.fieldWithPath("beerStyle").description("beerStyle of beer"),
+                    PayloadDocumentation.fieldWithPath("upc").description("upc of beer"),
+                    PayloadDocumentation.fieldWithPath("createdDate").ignored(),
+                    PayloadDocumentation.fieldWithPath("lastUpdatedDate").ignored(),
+                    PayloadDocumentation.fieldWithPath("quantityOnHand").description("quantityOnHand of beer")
+                )
+                )
+            );
+    }
+
+    private void customRequestFieldsWithConstrainsts(String beerDtoJson) throws Exception {
+        ConstrainedFields fields = new ConstrainedFields(BeerDto.class);
+
+        mockMvc.perform(RestDocumentationRequestBuilders.post("/api/v1/beer/")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(beerDtoJson))
+            .andExpect(status().isCreated())
+            //document needs to have unique name, otherwise will be override
+            .andDo(MockMvcRestDocumentation.document("v1/beer-new",
+                PayloadDocumentation.requestFields(
+                    //and again we need to pass all required fields for BeerDto or explicitly specify field to be ignored
+                    //four fields are specified as ignored, API users should never send those
+                    // others are modifiable and should be passed
+                    fields.withPath("uuid").ignored(),
+                    fields.withPath("beerName").description("beerName of beer"),
+                    fields.withPath("beerStyle").description("beerStyle of beer"),
+                    fields.withPath("upc").description("upc of beer").attributes(),
+                    fields.withPath("createdDate").ignored(),
+                    fields.withPath("lastUpdatedDate").ignored(),
+                    //this will be maintained by backend system API
+                    fields.withPath("quantityOnHand").ignored()
+                )
+                )
+            );
+    }
+
+    //we added 'constraints' field to 'test/resources/org/springframework/restdocs/templates/request-fields.snippet' file
+    //here we handle Custom 'constraints' field
+    //so we need to specify that field here
+    private static class ConstrainedFields {
+
+        private final ConstraintDescriptions constraintDescriptions;
+
+        ConstrainedFields(Class<?> input) {
+            this.constraintDescriptions = new ConstraintDescriptions(input);
+        }
+
+        private FieldDescriptor withPath(String path) {
+            return PayloadDocumentation.fieldWithPath(path).attributes(Attributes.key("constraints").value(StringUtils
+                .collectionToDelimitedString(this.constraintDescriptions
+                    .descriptionsForProperty(path), ". ")));
+        }
+
     }
 
 }

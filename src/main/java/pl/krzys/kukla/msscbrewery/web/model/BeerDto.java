@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Null;
 import javax.validation.constraints.Positive;
+import javax.validation.constraints.Size;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
@@ -27,6 +28,7 @@ public class BeerDto {
     private UUID uuid;
 
     @NotBlank
+    @Size(min = 3, max = 100)
     private String beerName;
 
     @NotBlank
@@ -36,8 +38,13 @@ public class BeerDto {
     private Long upc;
 
     //good type to use in public interfaces
+    @Null
     private OffsetDateTime createdDate;
 
+    @Null
     private OffsetDateTime lastUpdatedDate;
+
+    @Positive
+    private Integer quantityOnHand;
 
 }

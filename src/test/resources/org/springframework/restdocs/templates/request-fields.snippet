@@ -1,0 +1,15 @@
+// This is Custom requires fields snippet
+//    Default implementation has: path, type and description properties
+// now we added 'constraints' property as well, so we need to specify that in test
+
+|===
+|Path|Type|Description|Constraints
+
+{{#fields}}
+|{{path}}
+|{{type}}
+|{{description}}
+|{{constraints}}
+
+{{/fields}}
+|===
